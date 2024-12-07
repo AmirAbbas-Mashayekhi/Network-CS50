@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mysql:8.1
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: network_db
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - network_db:/var/lib/mysql
+    restart: always
+
+  webapp:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: 1
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_DB_HOST: db
+      DJANGO_DB_PORT: 3306
+      DJANGO_DB_NAME: ${MYSQL_DATABASE}
+      DJANGO_DB_USER: ${MYSQL_USER}
+      DJANGO_DB_PASSWORD: ${MYSQL_PASSWORD}
+    depends_on:
+      - db
+    restart: unless-stopped
+    volumes:
+      - .:/app
+
+
+volumes:
+  network_db:
