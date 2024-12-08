@@ -18,8 +18,8 @@ Welcome to the **CS50 Web Programming (CS50W)** course's **Network** project, de
 1. Clone this repository:
 
    ```bash
-   git clone <repository-url>
-   cd <project-directory>
+   git clone https://github.com/AmirAbbas-Mashayekhi/Network-CS50.git
+   cd network
    ```
 
 2. **Docker Setup**:  
