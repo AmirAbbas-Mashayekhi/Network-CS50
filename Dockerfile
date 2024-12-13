@@ -24,7 +24,7 @@ USER app
 # Copy the rest of the application files
 COPY . .
 
-# Run the Django development server
-CMD ["python", "manage.py", "runserver"]
+# Run the Django development server after waiting for the database to run
+CMD ["scripts/wait-for-it.sh", "mysql:3306", "--", "python3", "manage.py", "runserver", "0.0.0.0:8000"]
 
 EXPOSE 8000
