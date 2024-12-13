@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.10-slim
 
 # Install necessary system dependencies for building Python packages like mysqlclient
 RUN apt-get update && apt-get install -y \
