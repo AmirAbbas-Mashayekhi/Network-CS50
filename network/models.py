@@ -26,7 +26,7 @@ class Follow(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.follower_user} follows {self.followed_user}"
+        return f"{self.follower} follows {self.followed}"
 
 
 class Post(models.Model):
