@@ -41,7 +41,7 @@ class Post(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.user.username}'s Post: {self.body[:30]}"
+        return f"{self.body[:30]}"
 
 
 class Like(models.Model):
