@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    bio = models.CharField(max_length=300)
+    pass
 
 
 class Follow(models.Model):
