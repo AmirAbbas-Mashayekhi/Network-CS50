@@ -5,7 +5,7 @@
 
         <!-- Render form if user is authenticated -->
         {% if user.is_authenticated %}
-            <form method="post" class="mb-1 mt-4">
+            <form method="post" class="mb-1 mt-4" id="customForm">
                 {% csrf_token %}
                 <div class="form-group">
                     {{ form.body }}

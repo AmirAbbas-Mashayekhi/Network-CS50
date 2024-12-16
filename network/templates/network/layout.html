@@ -6,6 +6,20 @@
         <title>{% block title %}Social Network{% endblock %}</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="{% static 'network/styles.css' %}" rel="stylesheet">
+        <style>
+           #customForm input, #customForm textarea, #customForm select {
+              border: none !important;
+              outline: none !important;
+              box-shadow: none !important;
+              font-size: 18px;
+            }
+            #customForm input::placeholder,
+            #customForm textarea::placeholder {
+              font-size: 20px; /* Set the size as per your requirement */
+              color: #6c757d; /* Optional: Change the placeholder color */
+            }
+            
+        </style>
     </head>
     <body>
 
