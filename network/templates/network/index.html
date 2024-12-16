@@ -1,5 +1,33 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+    <div class="wrapper container-fluid mt-3">
+
+        <!-- Render form if user is authenticated -->
+        {% if user.is_authenticated %}
+            <form method="post" class="mb-1 mt-4">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.body }}
+                    {{ form.body.errors }}
+                </div>
+                <button type="submit" class="btn btn-dark">Post</button>
+            </form>
+            <hr>
+        {% endif %}
+        
+        <!-- Render posts -->
+        {% for post in all_posts %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">@{{ post.user.username }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted small">{{ post.created_at }}</h6>
+                    <p class="card-text">{{ post.body }}</p>
+                    <!-- <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a> -->
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
 {% endblock %}
