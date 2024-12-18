@@ -11,7 +11,7 @@ class AddPostForm(ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Write what's on your mind here...",
-                    "rows": 4,
+                    "rows": 3,
                 }
             ),
         }
