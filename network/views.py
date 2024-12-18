@@ -10,17 +10,25 @@ from .forms import AddPostForm
 
 
 def index(request):
-    all_posts = Post.objects.all().order_by('-created_at')
+    all_posts = Post.objects.all().order_by("-created_at")
 
     if request.method == "POST":
         form = AddPostForm(request.POST)
 
         if form.is_valid():
             Post.objects.create(body=form.cleaned_data["body"], user=request.user)
-            return HttpResponseRedirect(reverse('index'))
-        # else:
-        #     return render(request, "network/")
-
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return render(
+                request,
+                "network/index.html",
+                context={
+                    "form": form,
+                    "all_posts": all_posts,
+                    "title": "All Posts",
+                    "errors": form.errors,  # Pass the form errors to the template
+                },
+            )
     else:
         form = AddPostForm()
         return render(
@@ -29,6 +37,7 @@ def index(request):
             context={
                 "form": form,
                 "all_posts": all_posts,
+                "title": "All Posts",
             },
         )
 
