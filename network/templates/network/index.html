@@ -47,7 +47,7 @@
         {% for post in all_posts %}
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">@{{ post.user.username }}</h5>
+                    <a href="{% url 'profile' post.user.username %}" style="text-decoration: none;"><h5 class="card-title">@{{ post.user.username }}</h5></a>
                     <h6 class="card-subtitle mb-2 text-muted small">{{ post.created_at }}</h6>
                     <p class="card-text">{{ post.body }}</p>
                     <!-- <a href="#" class="card-link">Card link</a> -->
