@@ -2,10 +2,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from .models import Post, User
+from .models import Follow, Post, User
 from .forms import AddPostForm
 
 
@@ -94,3 +94,43 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
+@login_required
+def profile(request, username):
+    # The user we are reaching for
+    profile_owner = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(user=profile_owner).order_by("-created_at")
+    request_user = User.objects.get(pk=request.user.id)
+
+    # Check if the user is viewing their own profile
+    viewer_is_owner = request_user.id == profile_owner.id
+
+    is_followed = Follow.objects.filter(
+        follower=request_user, followed=profile_owner
+    ).exists()
+
+    return render(
+        request,
+        "network/profile.html",
+        context={
+            "profile_owner": profile_owner,
+            "posts": posts,
+            "viewer_is_owner": viewer_is_owner,
+            "is_followed": is_followed,
+        },
+    )
+
+
+@login_required
+def follow_unfollow(request, username, action: str):
+    if request.method == "POST":
+        profile = get_object_or_404(User, username=username)
+        if action.upper() == "FOLLOW":
+            Follow.objects.get_or_create(follower=request.user, followed=profile)
+        elif action.upper() == "UNFOLLOW":
+            follow_instance = Follow.objects.filter(follower=request.user, followed=profile)
+            if follow_instance:
+                follow_instance.delete()
+                
+        return HttpResponseRedirect(reverse('profile', args=[username]))

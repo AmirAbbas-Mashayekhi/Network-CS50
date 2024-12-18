@@ -1,0 +1,70 @@
+{% extends "network/layout.html" %}
+
+{% block title %}
+  @{{ profile_owner.username }} Profile
+{% endblock title %}
+
+{% block body %}
+<!-- Profile  -->
+<div class="card" style="border-radius: 0; border: none;">
+    <div class="card-body d-flex align-items-center" style="gap: 1rem;">
+      <!-- Placeholder for profile picture -->
+      <div class="me-3 d-flex justify-content-center align-items-center bg-secondary text-white rounded-circle"
+           style="width: 60px; height: 60px; font-size: 24px;">
+        {{ profile_owner.username|slice:":1"|upper }}
+      </div>
+
+      <!-- Profile Details -->
+      <div>
+        <!-- Username -->
+        <h4 class="card-title mb-1">@{{ profile_owner.username }}</h4>
+
+        <!-- Joined Date -->
+        <h6 class="card-subtitle text-muted my-2">Joined: {{ profile_owner.date_joined.date }}</h6>
+
+        <!-- Followers and Following -->
+        <div class="d-flex" style="gap: 10px">
+          <div><strong>{{ profile_owner.followers.count }}</strong> Followers</div>
+          <div><strong>{{ profile_owner.following.count }}</strong> Following</div>
+        </div>
+      </div>
+    </div>
+  </div>
+    {% if not viewer_is_owner %}
+        <div class="button-wrapper w-25 ml-4">
+            {% if is_followed %}
+                <form method="POST" action="{% url 'follow_unfollow' profile_owner.username 'UNFOLLOW' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-dark dotted-font" style="width: 250px;">UNFOLLOW</button>
+                </form>
+            {% else %}
+                <form method="POST" action="{% url 'follow_unfollow' profile_owner.username 'FOLLOW' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-dark dotted-font" style="width: 250px;">FOLLOW</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+  <hr>
+<div class="container-fluid">
+    <!-- Posts -->
+    {% for post in posts %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">@{{ post.user.username }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted small">{{ post.created_at }}</h6>
+                <p class="card-text">{{ post.body }}</p>
+                <!-- <a href="#" class="card-link">Card link</a> -->
+                <div class="d-flex" style="gap: 4px;">
+                    <a href="#" class="card-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                        </svg>
+                    </a>
+                    <p>{{ post.likes.count }}</p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock body %}
