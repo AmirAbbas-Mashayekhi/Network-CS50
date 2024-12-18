@@ -9,7 +9,7 @@
     <!-- If any errors -->
     {% if errors %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <ul class="mb-0">
+        <ul class="my-1">
             {% for field, error_list in errors.items %}
                 <li><strong>{{ field|capfirst }}</strong>:
                     <ul>
@@ -27,14 +27,12 @@
     {% endif %}
 
     <div class="wrapper container-fluid mt-3">
-
         <!-- Render form if user is authenticated -->
         {% if user.is_authenticated %}
             <form method="post" class="mb-1 mt-4" id="customForm">
                 {% csrf_token %}
                 <div class="form-group">
                     {{ form.body }}
-                    {{ form.body.errors }}
                 </div>
                 <button type="submit" class="btn btn-outline-dark btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
