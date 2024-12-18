@@ -1,8 +1,8 @@
+from django.core.paginator import Paginator
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from .models import Follow, Post, User
@@ -10,38 +10,37 @@ from .forms import AddPostForm
 
 
 def index(request):
-    all_posts = Post.objects.all().order_by("-created_at")
-
+    # Handle form submission
+    errors = {}
     if request.method == "POST":
         form = AddPostForm(request.POST)
-
         if form.is_valid():
-            Post.objects.create(body=form.cleaned_data["body"], user=request.user)
-            return HttpResponseRedirect(reverse("index"))
+            post = form.save(commit=False)
+            post.user = request.user
+            post.save()
+            return redirect("index")
         else:
-            return render(
-                request,
-                "network/index.html",
-                context={
-                    "form": form,
-                    "all_posts": all_posts,
-                    "title": "All Posts",
-                    "errors": form.errors,
-                    "index": True,
-                },
-            )
-    else:
-        form = AddPostForm()
-        return render(
-            request,
-            "network/index.html",
-            context={
-                "form": form,
-                "all_posts": all_posts,
-                "title": "All Posts",
-                "index": True,
-            },
-        )
+            errors = form.errors
+
+    # Fetch posts and paginate
+    posts = Post.objects.all().order_by("-created_at")
+
+    # Pagination
+    paginator = Paginator(posts, 10, orphans=3)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        "network/index.html",
+        context={
+            "form": AddPostForm(),
+            "page_obj": page_obj,
+            "errors": errors,
+            "index": True,
+            "title": "Home",
+        },
+    )
 
 
 def login_view(request):
@@ -55,7 +54,7 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse("index"))
+            return redirect(reverse("index"))
         else:
             return render(
                 request,
@@ -68,7 +67,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    return redirect(reverse("index"))
 
 
 def register(request):
@@ -93,21 +92,27 @@ def register(request):
                 request, "network/register.html", {"message": "Username already taken."}
             )
         login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        return redirect(reverse("index"))
     else:
         return render(request, "network/register.html")
 
 
 @login_required
 def profile(request, username):
-    # The user we are reaching for
+    # Get the user whose profile is being viewed
     profile_owner = get_object_or_404(User, username=username)
     posts = Post.objects.filter(user=profile_owner).order_by("-created_at")
-    request_user = User.objects.get(pk=request.user.id)
+    request_user = request.user
 
-    # Check if the user is viewing their own profile
-    viewer_is_owner = request_user.id == profile_owner.id
+    # Pagination
+    paginator = Paginator(posts, 10, orphans=3)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
+    # Determine if the current user owns the profile
+    viewer_is_owner = request_user == profile_owner
+
+    # Check if the current user is following the profile owner
     is_followed = Follow.objects.filter(
         follower=request_user, followed=profile_owner
     ).exists()
@@ -117,7 +122,7 @@ def profile(request, username):
         "network/profile.html",
         context={
             "profile_owner": profile_owner,
-            "posts": posts,
+            "page_obj": page_obj,
             "viewer_is_owner": viewer_is_owner,
             "is_followed": is_followed,
         },
@@ -137,7 +142,7 @@ def follow_unfollow(request, username, action: str):
             if follow_instance:
                 follow_instance.delete()
 
-        return HttpResponseRedirect(reverse("profile", args=[username]))
+        return redirect(reverse("profile", args=[username]))
 
 
 @login_required
@@ -145,11 +150,15 @@ def following_feed(request):
     user = get_object_or_404(User, pk=request.user.id)
     following_user_ids = user.following.values_list("followed_id", flat=True)
 
-    posts = Post.objects.filter(user__id__in=following_user_ids)
+    posts = Post.objects.filter(user__id__in=following_user_ids).order_by('-created_at')
+
+    # Pagination
+    pagination = Paginator(posts, 10, orphans=3)
+    page_number = request.GET.get("page")
+    page_obj = pagination.get_page(page_number)
 
     return render(
         request,
         "network/index.html",
-        context={"title": "following", "all_posts": posts, "index": False},
+        context={"title": "following", "page_obj": page_obj, "index": False},
     )
-    

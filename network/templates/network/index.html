@@ -5,8 +5,7 @@
 {% endblock title %}
 
 {% block body %}
-
-    <!-- If any errors -->
+    <!-- Error rendering -->
     {% if errors %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <ul class="my-1">
@@ -26,15 +25,16 @@
     </div>
     {% endif %}
 
+    <!-- Wrapper -->
     <div class="wrapper container-fluid mt-3">
-        <!-- Render form if user is authenticated -->
+        <!-- Render form for authenticated users -->
         {% if user.is_authenticated and index %}
             <form method="post" class="mb-1 mt-4" id="customForm">
                 {% csrf_token %}
                 <div class="form-group">
                     {{ form.body }}
                 </div>
-                <button type="submit" class="btn" id="send-btn" style="border: none; border-radius: 5px;" >
+                <button type="submit" class="btn" id="send-btn" style="border: none; border-radius: 5px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
                         <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/>
                     </svg>
@@ -42,26 +42,72 @@
             </form>
             <hr>
         {% endif %}
-        
-        <!-- Render posts -->
-        {% for post in all_posts %}
+
+        <!-- Render paginated posts -->
+        {% for post in page_obj %}
             <div class="card mb-4">
                 <div class="card-body">
-                    <a href="{% url 'profile' post.user.username %}" style="text-decoration: none;"><h5 class="card-title">@{{ post.user.username }}</h5></a>
+                    <a href="{% url 'profile' post.user.username %}" style="text-decoration: none;">
+                        <h5 class="card-title">@{{ post.user.username }}</h5>
+                    </a>
                     <h6 class="card-subtitle mb-2 text-muted small">{{ post.created_at }}</h6>
                     <p class="card-text">{{ post.body }}</p>
-                    <!-- <a href="#" class="card-link">Card link</a> -->
                     <div class="d-flex" style="gap: 4px;">
                         <a href="#" class="card-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-                          </svg>
+                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                            </svg>
                         </a>
                         <p>{{ post.likes.count }}</p>
                     </div>
                 </div>
             </div>
         {% endfor %}
-    </div>
 
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center pagination-sm">
+                <!-- Previous Button -->
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        &lsaquo;
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&lsaquo;</span>
+                </li>
+                {% endif %}
+
+                <!-- Page Numbers -->
+                {% for page_num in page_obj.paginator.page_range %}
+                    {% if page_num == page_obj.number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% elif page_num >= page_obj.number|add:-1 and page_num <= page_obj.number|add:1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next Button -->
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        &rsaquo;
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&rsaquo;</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
 {% endblock %}
