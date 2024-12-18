@@ -28,7 +28,7 @@
 
     <div class="wrapper container-fluid mt-3">
         <!-- Render form if user is authenticated -->
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and index %}
             <form method="post" class="mb-1 mt-4" id="customForm">
                 {% csrf_token %}
                 <div class="form-group">

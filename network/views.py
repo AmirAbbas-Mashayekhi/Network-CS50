@@ -26,7 +26,8 @@ def index(request):
                     "form": form,
                     "all_posts": all_posts,
                     "title": "All Posts",
-                    "errors": form.errors,  # Pass the form errors to the template
+                    "errors": form.errors,
+                    "index": True,
                 },
             )
     else:
@@ -38,6 +39,7 @@ def index(request):
                 "form": form,
                 "all_posts": all_posts,
                 "title": "All Posts",
+                "index": True,
             },
         )
 
@@ -129,8 +131,25 @@ def follow_unfollow(request, username, action: str):
         if action.upper() == "FOLLOW":
             Follow.objects.get_or_create(follower=request.user, followed=profile)
         elif action.upper() == "UNFOLLOW":
-            follow_instance = Follow.objects.filter(follower=request.user, followed=profile)
+            follow_instance = Follow.objects.filter(
+                follower=request.user, followed=profile
+            )
             if follow_instance:
                 follow_instance.delete()
-                
-        return HttpResponseRedirect(reverse('profile', args=[username]))
+
+        return HttpResponseRedirect(reverse("profile", args=[username]))
+
+
+@login_required
+def following_feed(request):
+    user = get_object_or_404(User, pk=request.user.id)
+    following_user_ids = user.following.values_list("followed_id", flat=True)
+
+    posts = Post.objects.filter(user__id__in=following_user_ids)
+
+    return render(
+        request,
+        "network/index.html",
+        context={"title": "following", "all_posts": posts, "index": False},
+    )
+    
