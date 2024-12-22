@@ -2,12 +2,11 @@
 
 {% block body %}
 
+<div class="w-50 m-auto" style="display: flex; justify-content: center; height: 90vh; flex-direction: column;">
     <h2>Register</h2>
-
     {% if message %}
         <div>{{ message }}</div>
     {% endif %}
-
     <form action="{% url 'register' %}" method="post">
         {% csrf_token %}
         <div class="form-group">
@@ -24,7 +23,8 @@
         </div>
         <input class="btn btn-primary" type="submit" value="Register">
     </form>
-
-    Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+    <br>
+    <p>Already have an account? <a href="{% url 'login' %}">Log In here.</a></p>
+</div>
 
 {% endblock %}
