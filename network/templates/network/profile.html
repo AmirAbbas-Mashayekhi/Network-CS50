@@ -29,9 +29,8 @@
         </div>
       </div>
     </div>
-  </div>
     {% if not viewer_is_owner %}
-        <div class="button-wrapper w-25 ml-4">
+        <div class="button-wrapper w-25 ml-4 pb-4">
             {% if is_followed %}
                 <form method="POST" action="{% url 'follow_unfollow' profile_owner.username 'UNFOLLOW' %}">
                     {% csrf_token %}
@@ -45,6 +44,7 @@
             {% endif %}
         </div>
     {% endif %}
+  </div>
   <hr>
 <div class="container-fluid">
     <!-- Posts -->
@@ -83,7 +83,7 @@
                 </a>
             </li>
             {% else %}
-            <li class="page-item disabled">
+            <li class="page-item">
                 <span class="page-link">&lsaquo;</span>
             </li>
             {% endif %}
@@ -109,7 +109,7 @@
                 </a>
             </li>
             {% else %}
-            <li class="page-item disabled">
+            <li class="page-item">
                 <span class="page-link">&rsaquo;</span>
             </li>
             {% endif %}
