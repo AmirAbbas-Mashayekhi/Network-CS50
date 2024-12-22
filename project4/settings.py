@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import dotenv
+from pathlib import Path
 
 # Load from .env file
 dotenv.load_dotenv()
@@ -131,5 +132,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / Path("static")]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

@@ -7,7 +7,7 @@
 {% block body %}
   <div class="container">
       <div class="image-wrapper w-100 d-flex justify-content-center">
-        <img src="{{ image_path }}" alt="Illustration" class="w-70">
+        <img src="{% static image_path %}" alt="Illustration" class="w-70">
       </div>
       <h1 class="display-5">{{ message }}</h1>
   </div>

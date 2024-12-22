@@ -14,4 +14,5 @@ urlpatterns = [
         name="follow_unfollow",
     ),
     path("following/", views.following_feed, name="following_feed"),
+    path("edit/<int:post_id>", views.edit_post, name="edit-post"),
 ]

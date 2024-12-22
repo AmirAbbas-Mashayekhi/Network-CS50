@@ -2,8 +2,10 @@ from django.core.paginator import Paginator
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Follow, Post, User
 from .forms import AddPostForm
@@ -150,7 +152,7 @@ def following_feed(request):
     user = get_object_or_404(User, pk=request.user.id)
     following_user_ids = user.following.values_list("followed_id", flat=True)
 
-    posts = Post.objects.filter(user__id__in=following_user_ids).order_by('-created_at')
+    posts = Post.objects.filter(user__id__in=following_user_ids).order_by("-created_at")
 
     # Pagination
     pagination = Paginator(posts, 10, orphans=3)
@@ -162,3 +164,28 @@ def following_feed(request):
         "network/index.html",
         context={"title": "following", "page_obj": page_obj, "index": False},
     )
+
+
+@login_required
+@csrf_exempt
+def edit_post(request, post_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method. Use POST."}, status=405)
+
+    # Get the post or return a 404 if it doesn't exist
+    post = get_object_or_404(Post, pk=post_id)
+
+    # Check if the user owns the post
+    if post.user != request.user:
+        return JsonResponse({"error": "Access Denied"}, status=403)
+
+    # Extract and validate the updated body from request.POST
+    new_body = request.POST.get("body")
+    if not new_body:
+        return JsonResponse({"error": "Post body is required."}, status=400)
+
+    # Update the post
+    post.body = new_body
+    post.save()
+
+    return JsonResponse({"message": "Post updated successfully."}, status=200)

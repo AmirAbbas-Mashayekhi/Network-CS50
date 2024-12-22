@@ -18,14 +18,11 @@
               font-size: 20px; /* Set the size as per your requirement */
               color: #6c757d; /* Optional: Change the placeholder color */
             }
-            
         </style>
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            
+        <nav class="navbar navbar-expand-lg navbar-dark">
             <a class="navbar-brand" href="{% url 'index' %}">Network</a>
-          
             <div>
               <ul class="navbar-nav mr-auto">
                 {% if user.is_authenticated %}
