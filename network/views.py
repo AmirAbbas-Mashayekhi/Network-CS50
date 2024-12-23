@@ -112,24 +112,24 @@ def register(request):
 
 def profile(request, username):
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(user=user).annotate(
-        like_count=Coalesce(Count('likes'), Value(0))
-    ).order_by("-created_at")
+    posts = (
+        Post.objects.filter(user=user)
+        .annotate(like_count=Coalesce(Count("likes"), Value(0)))
+        .order_by("-created_at")
+    )
 
     if request.user.is_authenticated:
-        user_likes = Like.objects.filter(user=request.user, post=OuterRef('pk'))
-        posts = posts.annotate(
-            liked_by_user=Exists(user_likes)
-        )
+        user_likes = Like.objects.filter(user=request.user, post=OuterRef("pk"))
+        posts = posts.annotate(liked_by_user=Exists(user_likes))
     else:
-        posts = posts.annotate(
-            liked_by_user=Value(False, output_field=BooleanField())
-        )
+        posts = posts.annotate(liked_by_user=Value(False, output_field=BooleanField()))
 
     # Pagination
     paginator = Paginator(posts, 10, orphans=3)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
+    viewer_is_owner = request.user == user
 
     return render(
         request,
@@ -138,8 +138,10 @@ def profile(request, username):
             "profile_owner": user,
             "page_obj": page_obj,
             "title": f"{user.username}'s Profile",
+            "viewer_is_owner": viewer_is_owner,
         },
     )
+
 
 @login_required
 def follow_unfollow(request, username, action: str):
