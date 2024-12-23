@@ -82,11 +82,11 @@ WSGI_APPLICATION = "project4.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("MYSQL_DATABASE"),
-        "USER": os.getenv("MYSQL_USER"),
-        "PASSWORD": os.getenv("MYSQL_PASSWORD"),
-        "HOST": os.getenv("MYSQL_HOST"),
-        "PORT": 3306,
+        "NAME": os.getenv("MYSQL_DATABASE", "default_db"),
+        "USER": os.getenv("MYSQL_USER", "default_user"),
+        "PASSWORD": os.getenv("MYSQL_PASSWORD", "default_password"),
+        "HOST": os.getenv("MYSQL_HOST", "localhost"),
+        "PORT": os.getenv("MYSQL_PORT", "3306"),
         "OPTIONS": {
             "charset": "utf8mb4",  # Ensure the charset is set to utf8mb4
         },
