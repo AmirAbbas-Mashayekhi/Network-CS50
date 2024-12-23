@@ -121,3 +121,23 @@ textarea.form-control:focus {
 #send-btn:hover {
   color: #ffffff;
 }
+
+.like-button {
+  all: unset !important;
+  color: firebrick !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px !important;
+  cursor: pointer !important;
+}
+
+.like-button:focus,
+.like-button:active {
+  outline: none !important;
+  border: none !important;
+}
+
+.like-button:hover {
+  opacity: 0.8 !important;
+}

@@ -6,8 +6,12 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Count, Exists, OuterRef, Value
+from django.db.models.functions import Coalesce
+from django.db.models.fields import BooleanField
 
-from .models import Follow, Post, User
+
+from .models import Follow, Like, Post, User
 from .forms import AddPostForm
 
 
@@ -24,8 +28,16 @@ def index(request):
         else:
             errors = form.errors
 
-    # Fetch posts and paginate
-    posts = Post.objects.all().order_by("-created_at")
+    # Fetch posts and annotate with like status
+    posts = Post.objects.annotate(
+        like_count=Coalesce(Count("likes"), Value(0))
+    ).order_by("-created_at")
+
+    if request.user.is_authenticated:
+        user_likes = Like.objects.filter(user=request.user, post=OuterRef("pk"))
+        posts = posts.annotate(liked_by_user=Exists(user_likes))
+    else:
+        posts = posts.annotate(liked_by_user=Value(False, output_field=BooleanField()))
 
     # Pagination
     paginator = Paginator(posts, 10, orphans=3)
@@ -189,3 +201,29 @@ def edit_post(request, post_id):
     post.save()
 
     return JsonResponse({"message": "Post updated successfully."}, status=200)
+
+
+@login_required
+@csrf_exempt
+def toggle_like(request, post_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method. Use POST."}, status=405)
+
+    post = get_object_or_404(Post, pk=post_id)
+    user = request.user
+
+    # Check if the user has already liked the post
+    liked = Like.objects.filter(user=user, post=post).exists()
+
+    if liked:
+        # Unlike the post
+        Like.objects.filter(user=user, post=post).delete()
+        liked = False
+    else:
+        # Like the post
+        Like.objects.create(user=user, post=post)
+        liked = True
+
+    # Return the new like count
+    like_count = post.likes.count()
+    return JsonResponse({"liked": liked, "like_count": like_count}, status=200)
