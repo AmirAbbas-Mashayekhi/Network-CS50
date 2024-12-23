@@ -6,9 +6,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count, Exists, OuterRef, Value
+from django.db.models import Count, Exists, OuterRef, Value, BooleanField
 from django.db.models.functions import Coalesce
-from django.db.models.fields import BooleanField
 
 
 from .models import Follow, Like, Post, User
@@ -111,37 +110,36 @@ def register(request):
         return render(request, "network/register.html")
 
 
-@login_required
 def profile(request, username):
-    # Get the user whose profile is being viewed
-    profile_owner = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(user=profile_owner).order_by("-created_at")
-    request_user = request.user
+    user = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(user=user).annotate(
+        like_count=Coalesce(Count('likes'), Value(0))
+    ).order_by("-created_at")
+
+    if request.user.is_authenticated:
+        user_likes = Like.objects.filter(user=request.user, post=OuterRef('pk'))
+        posts = posts.annotate(
+            liked_by_user=Exists(user_likes)
+        )
+    else:
+        posts = posts.annotate(
+            liked_by_user=Value(False, output_field=BooleanField())
+        )
 
     # Pagination
     paginator = Paginator(posts, 10, orphans=3)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    # Determine if the current user owns the profile
-    viewer_is_owner = request_user == profile_owner
-
-    # Check if the current user is following the profile owner
-    is_followed = Follow.objects.filter(
-        follower=request_user, followed=profile_owner
-    ).exists()
-
     return render(
         request,
         "network/profile.html",
         context={
-            "profile_owner": profile_owner,
+            "profile_owner": user,
             "page_obj": page_obj,
-            "viewer_is_owner": viewer_is_owner,
-            "is_followed": is_followed,
+            "title": f"{user.username}'s Profile",
         },
     )
-
 
 @login_required
 def follow_unfollow(request, username, action: str):
