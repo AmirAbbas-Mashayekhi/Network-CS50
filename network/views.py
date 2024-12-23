@@ -145,6 +145,12 @@ def profile(request, username):
 
 @login_required
 def follow_unfollow(request, username, action: str):
+
+    # Don't allow users to follow themselves
+    request_user = User.objects.get(pk=request.user.id)
+    if request_user.username == username:
+        return JsonResponse({"error": "Users can't follow / unfollow themselves."})
+
     if request.method == "POST":
         profile = get_object_or_404(User, username=username)
         if action.upper() == "FOLLOW":
