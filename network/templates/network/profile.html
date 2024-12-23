@@ -68,7 +68,7 @@
                 </div>
                 <p class="card-text" id="post-body-{{ post.id }}">{{ post.body }}</p>
                 <div class="like-section d-flex" style="align-items: center;">
-                    {% if  request.user.is_authenticated %}                      
+                    {% if request.user.is_authenticated %}                      
                         <button type="button" class="btn like-button" data-post-id="{{ post.id }}">
                             {% if post.liked_by_user %}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 18 18">
@@ -82,7 +82,12 @@
                     {% endif %}
                     
                     </button>
-                    <p class="mb-1 ml-0" id="like-count-{{ post.id }}">{{ post.like_count }} likes</p>
+                    <p class="mb-1 ml-0" id="like-count-{{ post.id }}">
+                        {{ post.like_count }} 
+                        {% if not request.user.is_authenticated %}
+                            likes
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
