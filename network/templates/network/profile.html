@@ -29,6 +29,7 @@
         </div>
       </div>
     </div>
+    <!-- Follow / Unfollow Button -->
     {% if not viewer_is_owner and request.user.is_authenticated%}
         <div class="button-wrapper w-25 ml-4 pb-4">
             {% if is_followed %}

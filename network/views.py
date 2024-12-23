@@ -130,6 +130,7 @@ def profile(request, username):
     page_obj = paginator.get_page(page_number)
 
     viewer_is_owner = request.user == user
+    is_followed = Follow.objects.filter(follower=request.user, followed=user).exists()
 
     return render(
         request,
@@ -139,6 +140,7 @@ def profile(request, username):
             "page_obj": page_obj,
             "title": f"{user.username}'s Profile",
             "viewer_is_owner": viewer_is_owner,
+            "is_followed": is_followed,
         },
     )
 
