@@ -130,7 +130,7 @@ def profile(request, username):
     page_obj = paginator.get_page(page_number)
 
     viewer_is_owner = request.user == user
-    is_followed = Follow.objects.filter(follower=request.user, followed=user).exists()
+    is_followed = Follow.objects.filter(follower=request.user, followed=user).exists() if request.user.is_authenticated else False
 
     return render(
         request,
