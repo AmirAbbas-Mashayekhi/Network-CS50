@@ -20,7 +20,7 @@ jobs:
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=10
 
     steps:
       - name: Checkout code
@@ -39,7 +39,7 @@ jobs:
       - name: Wait for MySQL
         run: |
           sudo apt-get install -y netcat
-          ./scripts/wait-for-it.sh mysql:3306 --timeout=60 --strict -- echo "MySQL is up"
+          ./scripts/wait-for-it.sh mysql:3306 --timeout=120 --strict -- echo "MySQL is up"
 
       - name: Run migrations
         env:
