@@ -47,6 +47,10 @@ jobs:
             sleep 5
           done
 
+      - name: Grant MySQL permissions
+        run: |
+          mysql -h 127.0.0.1 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON *.* TO 'test_user'@'%' IDENTIFIED BY 'test_password'; FLUSH PRIVILEGES;"
+
       - name: Run migrations
         env:
           DJANGO_SECRET_KEY: testsecretkey
