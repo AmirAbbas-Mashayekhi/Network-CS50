@@ -127,7 +127,7 @@ docker-compose exec web python manage.py runserver
 - ![Django](https://img.shields.io/badge/Django-5.1.3-brightgreen)
 - ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)
 - ![Docker](https://img.shields.io/badge/Docker-27.3-blueviolet)
-- ![Python](https://img.shields.io/plastic/Python-3.10-blue)
+- ![Python](https://img.shields.io/badge/Python-3.10-blue)
 
 ---
 
