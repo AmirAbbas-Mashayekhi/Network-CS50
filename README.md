@@ -133,4 +133,4 @@ docker-compose exec web python manage.py runserver
 
 ## 💡 Acknowledgments
 
-This project is part of the **CS50W** course from Harvard University. It was built using Django, MySQL, and Docker as part of the **Network** project, focusing on building a social network with user authentication, post creation, following users, liking posts, and other essential social media features.
+This project is part of the **CS50W** course from **Harvard University** . It was built using Django, MySQL, and Docker as part of the **Network** project, focusing on building a social network with user authentication, post creation, following users, liking posts, and other essential social media features.
